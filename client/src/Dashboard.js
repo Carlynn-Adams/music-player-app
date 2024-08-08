@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react'
-import useAuth from './useAuth'
+import React, { useState, useEffect } from 'react';
+import useAuth from './useAuth';
 import Player from './Player';
 import TrackSearchResult from './TrackSearchResult';
 import {Container, Form } from "react-bootstrap/Container";
 import SpotifyWebApi from 'spotify-web-api-node';
+import axios from 'axios';
 
 const spotifyApi = new SpotifyWebApi({
     clientId: "1ec151cbb14c4aefa8e5c1819a26b419",
@@ -14,11 +15,28 @@ export default function Dashboard({code}) {
     const [search, setSearch] = useState("")
     const [searchResults, setSearchResults] = useState([]);
     const [playingTrack, setPlayingTrack] = useState();
+    const [lyrics, setLyrics] = useState("");
 
     function chooseTrack(track) {
         setPlayingTrack(track);
-        setSearch('')
+        setSearch("")
+        setLyrics("")
     }
+
+    useEffect(() => {
+      if (!playingTrack) return;
+
+      axios
+        .get("http://localhost:3001/lyrics", {
+          params: {
+            track: playingTrack.title,
+            artist: playingTrack.artist,
+          },
+        })
+        .then((res) => {
+          setLyrics(res.data.lyrics);
+        });
+    }, [playingTrack]);
 
     useEffect(() => {
         if (!accessToken) return
