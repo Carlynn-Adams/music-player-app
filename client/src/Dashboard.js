@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import useAuth from './useAuth';
 import Player from './Player';
 import TrackSearchResult from './TrackSearchResult';
-import {Container, Form } from "react-bootstrap/Container";
+import Container from 'react-bootstrap/Container';
+import Form from 'react-bootstrap/Form';
 import SpotifyWebApi from 'spotify-web-api-node';
 import axios from 'axios';
 
