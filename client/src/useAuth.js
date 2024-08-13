@@ -8,7 +8,7 @@ export default function useAuth(code) {
 
     useEffect(() => {
       axios
-        .post("http://localhost:3001/login", {
+        .post("https://melodica-music-player-app.netlify.app/login", {
           code,
         })
         .then((res) => {
@@ -26,15 +26,21 @@ export default function useAuth(code) {
       if (!refreshToken || !expiresIn) return;
       const interval = setInterval(() => {
         axios
-          .post("http://localhost:3001/refresh", {
+          .post("https://melodica-music-player-app.netlify.app/refresh", {
             refreshToken,
           })
-          .then((res) => {
-            setAccessToken(res.data.accessToken);
-            setExpiresIn(res.data.expiresIn);
+          .then(({ data }) => {
+            const { accessToken, expiresIn } = data;
+            setAccessToken(accessToken);
+
+            // Only update expiresIn if it's different from the current value
+            if (expiresIn !== expiresIn) {
+              setExpiresIn(expiresIn);
+            }
           })
-          .catch(() => {
-            window.location = "/";
+          .catch((error) => {
+            console.error(error);
+            window.location.href = "/";
           });
       }, (expiresIn - 60) * 1000);
 
