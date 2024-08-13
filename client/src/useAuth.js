@@ -11,14 +11,21 @@ export default function useAuth(code) {
         .post("https://melodica-music-player-app.netlify.app/login", {
           code,
         })
-        .then((res) => {
-          setAccessToken(res.data.accessToken);
-          setRefreshToken(res.data.refreshToken);
-          setExpiresIn(res.data.expiresIn);
+        .then(({ data }) => {
+          const { accessToken, refreshToken, expiresAt } = data;
+          setAccessToken(accessToken);
+          setRefreshToken(refreshToken);
+
+          // Calculate expiresIn based on the expiresAt value
+          const expiresIn = Math.floor(
+            (new Date(expiresAt) - new Date()) / 1000
+          );
+          setExpiresIn(expiresIn);
+
           window.history.pushState({}, null, "/");
         })
         .catch(() => {
-          window.location = "/";
+          window.location.href = "/";
         });
     }, [code]);
 
@@ -30,12 +37,17 @@ export default function useAuth(code) {
             refreshToken,
           })
           .then(({ data }) => {
-            const { accessToken, expiresIn } = data;
+            const { accessToken, expiresAt } = data;
+
+            // Calculate newExpiresIn based on the expiresAt value
+            const newExpiresIn = Math.floor(
+              (new Date(expiresAt) - new Date()) / 1000
+            );
+
             setAccessToken(accessToken);
 
-            // Only update expiresIn if it's different from the current value
-            if (expiresIn !== expiresIn) {
-              setExpiresIn(expiresIn);
+            if (newExpiresIn !== expiresIn) {
+              setExpiresIn(newExpiresIn);
             }
           })
           .catch((error) => {
