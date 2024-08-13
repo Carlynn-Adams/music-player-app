@@ -31,6 +31,9 @@ export default function useAuth(code) {
 
     useEffect(() => {
       if (!refreshToken || !expiresIn) return;
+
+       console.log("Initial Expires In:", expiresIn);
+
       const interval = setInterval(() => {
         axios
           .post("https://melodica-music-player-app.netlify.app/refresh", {
@@ -39,10 +42,14 @@ export default function useAuth(code) {
           .then(({ data }) => {
             const { accessToken, expiresAt } = data;
 
+             console.log("Expires At:", expiresAt);
+
             // Calculate newExpiresIn based on the expiresAt value
             const newExpiresIn = Math.floor(
               (new Date(expiresAt) - new Date()) / 1000
             );
+
+            console.log("New Expires In:", newExpiresIn);
 
             setAccessToken(accessToken);
 
